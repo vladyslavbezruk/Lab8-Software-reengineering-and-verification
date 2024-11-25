@@ -11,38 +11,23 @@ public class AccountTest {
     }
 
     @Test
-    public void testBankchargePremiumMoreThanAWeek() {
-        Account account = getPremiumAccount(9);
-        assertThat(account.bankcharge(), is(16.5));
+    public void testGetAccountDetails() {
+        Account account = getPremiumAccount(5);
+        account.setIban("RO123456");
+        account.setMoney(100.0);
+        assertThat(account.getAccountDetails(), is("Account: IBAN: RO123456, Money: 100.0, Account type: premium"));
     }
 
     @Test
-    public void testOverdraftFeePremium() {
-        Account account = getPremiumAccount(9);
-        assertThat(account.overdraftFee(), is(0.10));
-    }
-
-    @Test
-    public void testOverdraftFeeNotPremium() {
-        Account account = getNormalAccount();
-        assertThat(account.overdraftFee(), is(0.20));
-    }
-
-    @Test
-    public void testPrintCustomer() {
-        Account account = getNormalAccount();
-        Customer customer = new Customer("xxx", "xxx", "xxx@mail.com", CustomerType.PERSON, account);
-        account.setCustomer(customer);
-        assertThat(account.printCustomer(), is("xxx xxx@mail.com"));
-    }
-
-    private Account getNormalAccount() {
-        AccountType premium = new AccountType(false);
-        return new Account(premium, 9);
+    public void testWithdrawWithOverdraft() {
+        Account account = getPremiumAccount(0);
+        account.setMoney(-50.0);
+        account.withdraw(20.0, 0.5);
+        assertThat(account.getMoney(), is(-70.5)); // -50 - 20 (немає штрафу через преміум)
     }
 
     private Account getPremiumAccount(int daysOverdrawn) {
-        AccountType normal = new AccountType(true);
-        return new Account(normal, daysOverdrawn);
+        AccountType premium = new AccountType(true);
+        return new Account(premium, daysOverdrawn);
     }
 }

@@ -1,7 +1,8 @@
 public class AccountType {
+
     private boolean premium;
 
-    AccountType(boolean premium) {
+    public AccountType(boolean premium) {
         this.premium = premium;
     }
 
@@ -9,8 +10,7 @@ public class AccountType {
         return premium;
     }
 
-    @Override
-    public String toString() {
+    public String getDescription() {
         return premium ? "premium" : "normal";
     }
 }

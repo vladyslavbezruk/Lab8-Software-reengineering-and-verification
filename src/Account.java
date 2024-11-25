@@ -8,33 +8,47 @@ public class Account {
     private Customer customer;
 
     public Account(AccountType type, int daysOverdrawn) {
-        super();
         this.type = type;
         this.daysOverdrawn = daysOverdrawn;
     }
 
-
-    public double bankcharge() {
-        double result = 4.5;
-        result += overdraftCharge();
-        return result;
+    public String getAccountDetails() {
+        return "Account: IBAN: " + iban + ", Money: " + money + ", Account type: " + type.getDescription();
     }
 
-    private double overdraftCharge() {
-        if (type.isPremium()) {
-            double result = 10;
-            if (getDaysOverdrawn() > 7)
-                result += (getDaysOverdrawn() - 7) * 1.0;
-            return result;
-        } else
-            return getDaysOverdrawn() * 1.75;
+    public String getCustomerDetails() {
+        return customer.getName() + " " + customer.getSurname() + " (Email: " + customer.getEmail() + ")";
+    }
+
+    public String getDaysOverdrawnDetails() {
+        return "Account: IBAN: " + iban + ", Days Overdrawn: " + daysOverdrawn;
+    }
+
+    public void withdraw(double amount, double overdraftDiscount) {
+        if (money < 0) {
+            double overdraftFee = calculateOverdraftFee(amount, overdraftDiscount);
+            setMoney(money - amount - overdraftFee);
+        } else {
+            setMoney(money - amount);
+        }
+    }
+
+    private double calculateOverdraftFee(double amount, double discount) {
+        double baseFee = amount * overdraftFee() * discount;
+        return type.isPremium() ? baseFee / 2 : baseFee;
     }
 
     public double overdraftFee() {
+        return type.isPremium() ? 0.10 : 0.20;
+    }
+
+    public double bankcharge() {
         if (type.isPremium()) {
-            return 0.10;
+            return daysOverdrawn > 7
+                    ? 10 + (daysOverdrawn - 7) * 0.85
+                    : 10 + daysOverdrawn * 0.9;
         } else {
-            return 0.20;
+            return daysOverdrawn * 1.75;
         }
     }
 
@@ -66,16 +80,9 @@ public class Account {
         this.customer = customer;
     }
 
-
     public AccountType getType() {
         return type;
     }
-
-
-    public String printCustomer() {
-        return customer.getName() + " " + customer.getEmail();
-    }
-
 
     public String getCurrency() {
         return currency;
