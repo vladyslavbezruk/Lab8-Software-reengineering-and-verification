@@ -31,40 +31,33 @@ public class Customer {
         if (!account.getCurrency().equals(currency)) {
             throw new RuntimeException("Can't extract withdraw " + currency);
         }
-        if (account.getType().isPremium()) {
-            switch (customerType) {
-                case COMPANY:
-                    // we are in overdraft
-                    if (account.getMoney() < 0) {
-                        // 50 percent discount for overdraft for premium account
-                        account.setMoney((account.getMoney() - sum) - sum * account.overdraftFee() * companyOverdraftDiscount / 2);
-                    } else {
-                        account.setMoney(account.getMoney() - sum);
-                    }
-                    break;
-                case PERSON:
-                    // we are in overdraft
-                    calculateMoneyByPerson(sum);
-                    break;
-            }
 
+        calculateMoney(sum, account.getType().isPremium());
+    }
+
+    private void calculateMoney(double sum, boolean isPremium) {
+        switch (customerType) {
+            case COMPANY:
+                // we are in overdraft
+                calculateMoneyByCompany(sum, isPremium);
+                break;
+            case PERSON:
+                // we are in overdraft
+                calculateMoneyByPerson(sum);
+                break;
+        }
+    }
+
+    private void calculateMoneyByCompany(double sum, boolean isPremium) {
+        if (account.getMoney() < 0) {
+            // 50 percent discount for overdraft for premium account
+            if (isPremium) {
+                account.setMoney((account.getMoney() - sum) - sum * account.overdraftFee() * companyOverdraftDiscount / 2);
+            } else {
+                account.setMoney((account.getMoney() - sum) - sum * account.overdraftFee() * companyOverdraftDiscount);
+            }
         } else {
-
-            switch (customerType) {
-                case COMPANY:
-                    // we are in overdraft
-                    if (account.getMoney() < 0) {
-                        // no discount for overdraft for not premium account
-                        account.setMoney((account.getMoney() - sum) - sum * account.overdraftFee() * companyOverdraftDiscount);
-                    } else {
-                        account.setMoney(account.getMoney() - sum);
-                    }
-                    break;
-                case PERSON:
-                    // we are in overdraft
-                    calculateMoneyByPerson(sum);
-                    break;
-            }
+            account.setMoney(account.getMoney() - sum);
         }
     }
 
@@ -75,7 +68,6 @@ public class Customer {
             account.setMoney(account.getMoney() - sum);
         }
     }
-
 
     public String getName() {
         return name;
