@@ -28,9 +28,8 @@ public class AccountTest {
     }
 
     private Account getPremiumAccount(int daysOverdrawn) {
-        AccountType premium = new AccountType(true);
         Currency usd = new Currency("USD");
         Money initialMoney = new Money(0.0, usd);
-        return new Account(premium, daysOverdrawn, initialMoney);
+        return new Account(true, daysOverdrawn, initialMoney); // Використовуємо булевий тип для premium
     }
 }

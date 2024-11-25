@@ -1,23 +1,23 @@
 public class Account {
     private String iban;
-    private AccountType type;
+    private boolean isPremium; // Булевий тип для типу рахунку (premium чи звичайний)
     private int daysOverdrawn;
     private Money money;
     private Customer customer;
 
-    public Account(AccountType type, int daysOverdrawn, Money money) {
-        this.type = type;
+    public Account(boolean isPremium, int daysOverdrawn, Money money) {
+        this.isPremium = isPremium;
         this.daysOverdrawn = daysOverdrawn;
         this.money = money;
     }
 
-    public Account(AccountType type, int daysOverdrawn) {
-        this.type = type;
+    public Account(boolean isPremium, int daysOverdrawn) {
+        this.isPremium = isPremium;
         this.daysOverdrawn = daysOverdrawn;
     }
 
     public String getAccountDetails() {
-        return "Account: IBAN: " + iban + ", Money: " + money + ", Account type: " + type.getDescription();
+        return "Account: IBAN: " + iban + ", Money: " + money + ", Account type: " + (isPremium ? "premium" : "normal");
     }
 
     public String getCustomerDetails() {
@@ -39,15 +39,15 @@ public class Account {
 
     private double calculateOverdraftFee(Money amount, OverdraftDiscount discount) {
         double baseFee = amount.getAmount() * overdraftFee() * discount.getDiscount();
-        return type.isPremium() ? baseFee / 2 : baseFee;
+        return isPremium ? baseFee / 2 : baseFee;
     }
 
     public double overdraftFee() {
-        return type.isPremium() ? 0.10 : 0.20;
+        return isPremium ? 0.10 : 0.20;
     }
 
     public double bankcharge() {
-        if (type.isPremium()) {
+        if (isPremium) {
             return daysOverdrawn > 7
                     ? 10 + (daysOverdrawn - 7) * 0.85
                     : 10 + daysOverdrawn * 0.9;
@@ -84,7 +84,7 @@ public class Account {
         this.customer = customer;
     }
 
-    public AccountType getType() {
-        return type;
+    public boolean isPremium() {
+        return isPremium;
     }
 }

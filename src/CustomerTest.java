@@ -12,8 +12,7 @@ public class CustomerTest {
     }
 
     private Customer getPersonWithAccount(boolean premium) {
-        AccountType accountType = new AccountType(premium);
-        Account account = new Account(accountType, 9);
+        Account account = new Account(premium, 9);
         Customer customer = new Customer("danix", "dan", "dan@mail.com", CustomerType.PERSON, account);
         account.setIban("RO023INGB434321431241");
         account.setMoney(new Money(34.0, new Currency("EUR")));
