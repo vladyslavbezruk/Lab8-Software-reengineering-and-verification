@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 public class Customer {
 
     private String name;
@@ -41,13 +43,8 @@ public class Customer {
                     }
                     break;
                 case PERSON:
-
                     // we are in overdraft
-                    if (account.getMoney() < 0) {
-                        account.setMoney((account.getMoney() - sum) - sum * account.overdraftFee());
-                    } else {
-                        account.setMoney(account.getMoney() - sum);
-                    }
+                    calculateMoneyByPerson(sum);
                     break;
             }
 
@@ -65,15 +62,20 @@ public class Customer {
                     break;
                 case PERSON:
                     // we are in overdraft
-                    if (account.getMoney() < 0) {
-                        account.setMoney((account.getMoney() - sum) - sum * account.overdraftFee());
-                    } else {
-                        account.setMoney(account.getMoney() - sum);
-                    }
+                    calculateMoneyByPerson(sum);
                     break;
             }
         }
     }
+
+    private void calculateMoneyByPerson(double sum) {
+        if (account.getMoney() < 0) {
+            account.setMoney((account.getMoney() - sum) - sum * account.overdraftFee());
+        } else {
+            account.setMoney(account.getMoney() - sum);
+        }
+    }
+
 
     public String getName() {
         return name;
