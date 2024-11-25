@@ -16,7 +16,7 @@ public class CustomerTest {
         Account account = new Account(accountType, 9);
         Customer customer = new Customer("danix", "dan", "dan@mail.com", CustomerType.PERSON, account);
         account.setIban("RO023INGB434321431241");
-        account.setMoney(new Money(34.0, "EUR"));
+        account.setMoney(new Money(34.0, new Currency("EUR")));
         return customer;
     }
 }

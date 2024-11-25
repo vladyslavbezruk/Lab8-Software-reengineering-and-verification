@@ -3,14 +3,12 @@ public class Account {
     private AccountType type;
     private int daysOverdrawn;
     private Money money;
-    private String currency;
     private Customer customer;
 
-    public Account(AccountType type, int daysOverdrawn, Money money, String currency) {
+    public Account(AccountType type, int daysOverdrawn, Money money) {
         this.type = type;
         this.daysOverdrawn = daysOverdrawn;
         this.money = money;
-        this.currency = currency;
     }
 
     public Account(AccountType type, int daysOverdrawn) {
@@ -88,13 +86,5 @@ public class Account {
 
     public AccountType getType() {
         return type;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
     }
 }
