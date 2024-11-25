@@ -14,20 +14,22 @@ public class AccountTest {
     public void testGetAccountDetails() {
         Account account = getPremiumAccount(5);
         account.setIban("RO123456");
-        account.setMoney(100.0);
-        assertThat(account.getAccountDetails(), is("Account: IBAN: RO123456, Money: 100.0, Account type: premium"));
+        account.setMoney(new Money(100.0, "USD"));
+        assertThat(account.getAccountDetails(), is("Account: IBAN: RO123456, Money: 100.0 USD, Account type: premium"));
     }
 
     @Test
     public void testWithdrawWithOverdraft() {
         Account account = getPremiumAccount(0);
-        account.setMoney(-50.0);
-        account.withdraw(20.0, 0.5);
-        assertThat(account.getMoney(), is(-70.5)); // -50 - 20 (немає штрафу через преміум)
+        account.setMoney(new Money(-50.0, "USD"));
+        OverdraftDiscount discount = new OverdraftDiscount(0.5);
+        account.withdraw(new Money(20.0, "USD"), discount);
+        assertThat(account.getMoney().getAmount(), is(-70.5));
     }
 
     private Account getPremiumAccount(int daysOverdrawn) {
         AccountType premium = new AccountType(true);
-        return new Account(premium, daysOverdrawn);
+        Money initialMoney = new Money(0.0, "USD");
+        return new Account(premium, daysOverdrawn, initialMoney, "USD");
     }
 }

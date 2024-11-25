@@ -8,7 +8,7 @@ public class CustomerTest {
     public void testPrintCustomerAccountNormal() throws Exception {
         Customer customer = getPersonWithAccount(false);
         CustomerFormatter customerFormatter = new CustomerFormatter();
-        assertThat(customerFormatter.printCustomerAccount(customer), is("Account: IBAN: RO023INGB434321431241, Money: 34.0, Account type: normal"));
+        assertThat(customerFormatter.printCustomerAccount(customer), is("Account: IBAN: RO023INGB434321431241, Money: 34.0 EUR, Account type: normal"));
     }
 
     private Customer getPersonWithAccount(boolean premium) {
@@ -16,8 +16,7 @@ public class CustomerTest {
         Account account = new Account(accountType, 9);
         Customer customer = new Customer("danix", "dan", "dan@mail.com", CustomerType.PERSON, account);
         account.setIban("RO023INGB434321431241");
-        account.setMoney(34.0);
-        account.setCurrency("EUR");
+        account.setMoney(new Money(34.0, "EUR"));
         return customer;
     }
 }

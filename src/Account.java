@@ -1,11 +1,17 @@
 public class Account {
-
     private String iban;
     private AccountType type;
     private int daysOverdrawn;
-    private double money;
+    private Money money;
     private String currency;
     private Customer customer;
+
+    public Account(AccountType type, int daysOverdrawn, Money money, String currency) {
+        this.type = type;
+        this.daysOverdrawn = daysOverdrawn;
+        this.money = money;
+        this.currency = currency;
+    }
 
     public Account(AccountType type, int daysOverdrawn) {
         this.type = type;
@@ -24,17 +30,17 @@ public class Account {
         return "Account: IBAN: " + iban + ", Days Overdrawn: " + daysOverdrawn;
     }
 
-    public void withdraw(double amount, double overdraftDiscount) {
-        if (money < 0) {
-            double overdraftFee = calculateOverdraftFee(amount, overdraftDiscount);
-            setMoney(money - amount - overdraftFee);
+    public void withdraw(Money amount, OverdraftDiscount discount) {
+        if (money.getAmount() < 0) {
+            double overdraftFee = calculateOverdraftFee(amount, discount);
+            money.subtract(new Money(amount.getAmount() + overdraftFee, amount.getCurrency()));
         } else {
-            setMoney(money - amount);
+            money.subtract(amount);
         }
     }
 
-    private double calculateOverdraftFee(double amount, double discount) {
-        double baseFee = amount * overdraftFee() * discount;
+    private double calculateOverdraftFee(Money amount, OverdraftDiscount discount) {
+        double baseFee = amount.getAmount() * overdraftFee() * discount.getDiscount();
         return type.isPremium() ? baseFee / 2 : baseFee;
     }
 
@@ -64,11 +70,11 @@ public class Account {
         this.iban = iban;
     }
 
-    public void setMoney(double money) {
+    public void setMoney(Money money) {
         this.money = money;
     }
 
-    public double getMoney() {
+    public Money getMoney() {
         return money;
     }
 
