@@ -1,42 +1,50 @@
 public class FinancialService {
 
-    public void withdraw(Customer customer, double sum, String currency) {
+    public void withdraw(Customer customer, double amount, String currency) {
         Account account = customer.getAccount();
 
         if (!account.getCurrency().equals(currency)) {
-            throw new RuntimeException("Can't extract withdraw " + currency);
+            throw new RuntimeException("Currency mismatch: " + currency + " is not supported.");
         }
 
-        calculateMoney(customer, sum, account.getType().isPremium());
+        processWithdrawal(customer, amount, account.getType().isPremium());
     }
 
-    private void calculateMoney(Customer customer, double sum, boolean isPremium) {
-        switch (customer.getCustomerType()) {
-            case COMPANY:
-                calculateMoneyByCompany(customer, sum, isPremium);
-                break;
-            case PERSON:
-                calculateMoneyByPerson(customer.getAccount(), sum);
-                break;
+    private void processWithdrawal(Customer customer, double amount, boolean isPremiumAccount) {
+        if (customer.getCustomerType() == CustomerType.COMPANY) {
+            handleCompanyWithdrawal(customer, amount, isPremiumAccount);
+        } else if (customer.getCustomerType() == CustomerType.PERSON) {
+            handlePersonalWithdrawal(customer.getAccount(), amount);
         }
     }
 
-    private void calculateMoneyByCompany(Customer customer, double sum, boolean isPremium) {
+    private void handleCompanyWithdrawal(Customer customer, double amount, boolean isPremiumAccount) {
         Account account = customer.getAccount();
         double discount = customer.getCompanyOverdraftDiscount();
-        if (account.getMoney() < 0) {
-            double overdraftFee = sum * account.overdraftFee() * discount;
-            account.setMoney(account.getMoney() - sum - (isPremium ? overdraftFee / 2 : overdraftFee));
+
+        if (isAccountOverdrawn(account)) {
+            double overdraftFee = calculateOverdraftFee(amount, account, discount, isPremiumAccount);
+            account.setMoney(account.getMoney() - amount - overdraftFee);
         } else {
-            account.setMoney(account.getMoney() - sum);
+            account.setMoney(account.getMoney() - amount);
         }
     }
 
-    private void calculateMoneyByPerson(Account account, double sum) {
-        if (account.getMoney() < 0) {
-            account.setMoney(account.getMoney() - sum - sum * account.overdraftFee());
+    private void handlePersonalWithdrawal(Account account, double amount) {
+        if (isAccountOverdrawn(account)) {
+            double overdraftFee = calculateOverdraftFee(amount, account, 1, false);
+            account.setMoney(account.getMoney() - amount - overdraftFee);
         } else {
-            account.setMoney(account.getMoney() - sum);
+            account.setMoney(account.getMoney() - amount);
         }
+    }
+
+    private boolean isAccountOverdrawn(Account account) {
+        return account.getMoney() < 0;
+    }
+
+    private double calculateOverdraftFee(double amount, Account account, double discount, boolean isPremiumAccount) {
+        double baseFee = amount * account.overdraftFee() * discount;
+        return isPremiumAccount ? baseFee / 2 : baseFee;
     }
 }
